@@ -1,0 +1,12 @@
+const express = require("express");
+const cors = require("cors");
+require("dotenv").config();
+const { connectDB } = require("./config/db");
+const app = express();
+app.use(cors()); app.use(express.json());
+app.use("/api/auth", require("./routes/auth"));
+app.use("/api/bookmarks", require("./routes/bookmarks"));
+app.get("/api/health", (_, res) => res.json({ status: "ok" }));
+app.use((err, req, res, next) => { console.error(err.stack); res.status(500).json({ msg: "error" }); });
+const PORT = process.env.PORT || 5000;
+(async () => { await connectDB(); app.listen(PORT, () => console.log(`api on ${PORT}`)); })();
