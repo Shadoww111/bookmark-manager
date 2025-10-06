@@ -1,0 +1,12 @@
+import axios from "axios";
+const api = axios.create({ baseURL: "/api" });
+api.interceptors.request.use((c) => { const t = localStorage.getItem("token"); if (t) c.headers.Authorization = `Bearer ${t}`; return c; });
+api.interceptors.response.use((r) => r, (e) => { if (e.response?.status === 401) { localStorage.removeItem("token"); if (location.pathname !== "/login") location.href = "/login"; } return Promise.reject(e); });
+export const registerUser = (d) => api.post("/auth/register", d);
+export const loginUser = (d) => api.post("/auth/login", d);
+export const getMe = () => api.get("/auth/me");
+export const getBookmarks = (p) => api.get("/bookmarks", { params: p });
+export const addBookmark = (d) => api.post("/bookmarks", d);
+export const editBookmark = (id, d) => api.put(`/bookmarks/${id}`, d);
+export const removeBookmark = (id) => api.delete(`/bookmarks/${id}`);
+export default api;
