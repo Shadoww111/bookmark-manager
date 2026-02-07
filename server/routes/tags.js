@@ -1,0 +1,5 @@
+const express = require("express"); const { Tag } = require("../models/Tag"); const auth = require("../middleware/auth"); const router = express.Router(); router.use(auth);
+router.get("/", async (req, res) => { try { res.json(await Tag.findAll({ where: { userId: req.user.id }, order: [["name","ASC"]] })); } catch { res.status(500).json({ msg: "error" }); } });
+router.post("/", async (req, res) => { try { if (!req.body.name) return res.status(400).json({ msg: "name required" }); const tag = await Tag.create({ name: req.body.name.toLowerCase().trim(), color: req.body.color, userId: req.user.id }); res.status(201).json(tag); } catch { res.status(500).json({ msg: "error" }); } });
+router.delete("/:id", async (req, res) => { try { const t = await Tag.findOne({ where: { id: req.params.id, userId: req.user.id } }); if (!t) return res.status(404).json({ msg: "not found" }); await t.destroy(); res.json({ msg: "deleted" }); } catch { res.status(500).json({ msg: "error" }); } });
+module.exports = router;
